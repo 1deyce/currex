@@ -60,7 +60,7 @@ function App() {
                 <h1 className="mb-6 font-bold">
                     Curre<span className="text-blue-500 italic">X</span>
                 </h1>
-                <p className="text-md mb-6">
+                <p className="text-lg mb-6">
                     At Currex, we understand that managing currency exchanges
                     can be a daunting task, whether you're traveling, investing,
                     or simply trying to make informed purchasing decisions.
