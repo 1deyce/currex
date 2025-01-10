@@ -21,7 +21,7 @@ function App() {
     const [fromValue, setFromValue] = useState("");
     const [toValue, setToValue] = useState("");
     const [amount, setAmount] = useState("");
-    const [convertedAmount, setConvertedAmount] = useState(null);
+    const [convertedAmount, setConvertedAmount] = useState(0);
     const [loading, setLoading] = useState(false);
 
     const handleConversion = async () => {
@@ -73,7 +73,7 @@ function App() {
                     button and watch the magic happen—your converted amount will
                     be displayed instantly!
                 </p>
-                <ul className="mb-40 text-sm">
+                <ul className="mb-20 text-sm">
                     <li>
                         1. Choose the currency you want to convert from and the
                         currency you want to convert to.{" "}
@@ -86,16 +86,20 @@ function App() {
                     </li>
                 </ul>
                 <div className="my-10 text-2xl">
-                    {loading ? "Loading..." : convertedAmount || "Waiting..."}
+                    {loading
+                        ? "Loading..."
+                        : convertedAmount !== 0
+                        ? `${convertedAmount} ${toValue}`
+                        : "Please select your inputs..."}
                 </div>
-                <div className="flex items-center flex-row gap-6 ">
+                <div className="flex items-center flex-row gap-6">
                     <Select onValueChange={setFromValue}>
                         <SelectTrigger className="w-[250px]">
                             <SelectValue placeholder="From" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectLabel>Currency Code</SelectLabel>
+                                <SelectLabel>From Currency Code</SelectLabel>
                                 <SelectItem value="USD">
                                     United States Dollar [USD]
                                 </SelectItem>
@@ -118,7 +122,7 @@ function App() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectLabel>Currency Code</SelectLabel>
+                                <SelectLabel>To Currency Code</SelectLabel>
                                 <SelectItem value="USD">
                                     United States Dollar [USD]
                                 </SelectItem>
@@ -153,8 +157,11 @@ function App() {
                         onClick={handleConversion}
                         type="submit"
                         className="w-[600px]"
+                        disabled={
+                            fromValue === "" || toValue === "" || amount === ""
+                        }
                     >
-                        Convert
+                        {loading ? "Converting..." : "Convert"}
                     </Button>
                 </div>
             </div>

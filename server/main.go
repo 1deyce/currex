@@ -48,8 +48,6 @@ func main() {
 		to := data.To
 		amountStr := data.Amount
 
-		log.Printf(from, to, amountStr)
-
 		appID := os.Getenv("OPENEXCHANGE_APP_ID")
 		if appID == "" {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "OPENEXCHANGE_APP_ID not set"})
