@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
@@ -57,17 +56,18 @@ const SpotPrices = () => {
 
     return (
         <div>
-            <h1>Spot Prices</h1>
+            <h2 className="text-3xl font-bold">Spot Prices</h2>
             <p className="mb-6">[Base Currency: USD]</p>
             <div>
                 <Table>
-                    <TableCaption>A list of currency rates.</TableCaption>
                     <TableHeader>
                         <TableRow>
                             <TableHead className="w-[100px] text-center">
                                 Currency
                             </TableHead>
-                            <TableHead className="text-center w-[100px]">Rate</TableHead>
+                            <TableHead className="text-center w-[100px]">
+                                Rate
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
