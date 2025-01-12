@@ -11,11 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
-
-const serverURL = import.meta.env.VITE_BACKEND_URL;
-if (!serverURL) {
-    throw new Error("Missing BACKEND_URL environment variable");
-}
+import SpotPrices from "./spots/spotPrices";
 
 function App() {
     const [fromValue, setFromValue] = useState("");
@@ -23,6 +19,11 @@ function App() {
     const [amount, setAmount] = useState("");
     const [convertedAmount, setConvertedAmount] = useState(0);
     const [loading, setLoading] = useState(false);
+
+    const serverURL = import.meta.env.VITE_BACKEND_URL;
+    if (!serverURL) {
+        throw new Error("Missing BACKEND_URL environment variable");
+    }
 
     const handleConversion = async () => {
         setLoading(true);
@@ -163,6 +164,9 @@ function App() {
                     >
                         {loading ? "Converting..." : "Convert"}
                     </Button>
+                </div>
+                <div className="mt-20">
+                    <SpotPrices />
                 </div>
             </div>
         </>

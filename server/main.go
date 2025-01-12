@@ -77,5 +77,22 @@ func main() {
 		return c.Status(fiber.StatusOK).JSON(response)
     })
 
+	app.Get("/spots", func(c *fiber.Ctx) error { 
+		appID := os.Getenv("OPENEXCHANGE_APP_ID")
+		if appID == "" {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "OPENEXCHANGE_APP_ID not set"})
+		}
+
+		apiURL := fmt.Sprintf("https://openexchangerates.org/api/latest.json?app_id=%s&symbols=EUR,JPY,GBP,AUD,CAD,CHF,CNY,SEK,NZD,MXN,SGD,HKD,NOK,KRW,TRY,RUB,INR,BRL,ZAR,THB", appID)
+
+		rates, err := rates.FetchRates(apiURL)
+		if err!= nil {
+            return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": fmt.Sprintf("Error fetching exchange rates: %v", err)})
+        }
+
+		log.Printf("Fetched rates: %+v\n", rates)
+		return c.JSON(rates)
+	})
+
 	log.Fatal(app.Listen(":8000"))
 }

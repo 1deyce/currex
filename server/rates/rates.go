@@ -3,6 +3,7 @@ package rates
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 )
 
@@ -11,6 +12,7 @@ type ExchangeRates struct {
 }
 
 func FetchRates(apiURL string) (ExchangeRates, error) {
+	log.Printf("Fetched rates: %+v\n", apiURL)
 	resp, err := http.Get(apiURL)
 	if err != nil {
 		return ExchangeRates{}, err
