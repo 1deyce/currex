@@ -91,7 +91,7 @@ function App() {
                     ? `${convertedAmount} ${toValue}`
                     : "Please select your inputs..."}
             </div>
-            <div className="flex flex-wrap items-center flex-row gap-6">
+            <div className="flex flex-wrap items-center flex-row gap-6 justify-center">
                 <Select onValueChange={setFromValue}>
                     <SelectTrigger className="w-[250px]">
                         <SelectValue placeholder="From" />
@@ -142,7 +142,7 @@ function App() {
                     type="number"
                     placeholder="Amount"
                     value={amount}
-                    className="font-bold"
+                    className="font-bold w-1/2"
                     onChange={(e) => {
                         const value = e.target.value;
                         if (value.match(/^\d*\.?\d{0,2}$/)) {
