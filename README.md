@@ -1,40 +1,6 @@
-Great! It sounds like you're working with a full-stack project that involves Go for the backend, React with TypeScript for the frontend, and Vite for build tools. Based on this, here's a detailed `README.md` for your project that covers both the Go server setup and the React/TypeScript frontend configuration.
-
-````markdown
 # Full-Stack Currency Exchange App
 
 This project is a full-stack web application that provides currency exchange functionality. It features a backend built with Go and Fiber, a lightweight web framework, and a frontend built with React, TypeScript, and Vite. The app allows users to interact with real-time currency exchange rates and perform conversions seamlessly.
-
-## Table of Contents
-
-- [Project Structure](#project-structure)
-- [Backend (Go)](#backend-go)
-- [Frontend (React/TypeScript)](#frontend-reacttypescript)
-- [Installation](#installation)
-  - [Backend Setup](#backend-setup)
-  - [Frontend Setup](#frontend-setup)
-- [Usage](#usage)
-- [Features](#features)
-- [Dependencies](#dependencies)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Project Structure
-
-```bash
-.
-├── backend/                # Go Fiber server
-│   ├── main.go             # Main server entry
-│   └── go.mod              # Go module dependencies
-│
-├── frontend/               # React + TypeScript with Vite
-│   ├── src/
-│   ├── public/
-│   └── package.json        # Frontend dependencies
-│
-└── .env                    # Environment variables
-```
-````
 
 ## Backend (Go)
 
@@ -46,7 +12,7 @@ The backend server is built with [Go](https://golang.org/) and the [Fiber](https
 2. Run the Go server:
 
 ```bash
-cd backend
+cd server
 go run main.go
 ```
 
@@ -56,8 +22,7 @@ The backend uses environment variables for configuration. You can set up your `.
 
 ```env
 # .env
-EXCHANGE_API_URL=https://api.exchangerate-api.com/v4/latest/USD
-PORT=3001
+OPENEXCHANGE_APP_ID="YOUR OPENEXCHANGE APP ID"
 ```
 
 ## Frontend (React/TypeScript)
@@ -70,7 +35,7 @@ The frontend is a React application using TypeScript, built with [Vite](https://
 2. Install frontend dependencies:
 
 ```bash
-cd frontend
+cd client
 npm install
 ```
 
@@ -78,6 +43,8 @@ npm install
 
 ```bash
 npm run dev
+or 
+yarn dev
 ```
 
 This will start the React development server, typically on `http://localhost:5173/`.
@@ -89,14 +56,14 @@ This will start the React development server, typically on `http://localhost:517
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/currency-exchange-app.git
-cd currency-exchange-app
+git clone https://github.com/1deyce/currex.git
+cd currex
 ```
 
 2. Navigate to the `backend` directory and install Go dependencies:
 
 ```bash
-cd backend
+cd server
 go mod tidy
 ```
 
@@ -113,14 +80,14 @@ go run main.go
 1. Navigate to the `frontend` directory and install dependencies:
 
 ```bash
-cd frontend
+cd client
 npm install
 ```
 
 2. Set up the `.env` file in the `frontend` directory, defining the backend server URL (assuming it's running locally):
 
 ```env
-VITE_BACKEND_URL=http://localhost:3001
+VITE_BACKEND_URL=http://localhost:8000 [eg]
 ```
 
 3. Run the frontend app:
@@ -134,7 +101,7 @@ The app will be available at `http://localhost:5173/` by default.
 ## Usage
 
 - Open the frontend application at `http://localhost:5173/`.
-- Enter the amount in one currency, select the source and target currencies, and the app will show the converted amount based on real-time exchange rates.
+- Enter the amount in one currency, select the "from" and "to" currencies, and the app will show the converted amount based on real-time exchange rates.
 
 The frontend communicates with the Go backend API to fetch the latest exchange rates and perform conversions.
 
@@ -156,7 +123,6 @@ The frontend communicates with the Go backend API to fetch the latest exchange r
 
 - [React](https://reactjs.org/): JavaScript library for building user interfaces
 - [Vite](https://vitejs.dev/): Next-generation, fast build tool
-- [Axios](https://axios-http.com/): Promise-based HTTP client for the browser and Node.js
 - [TypeScript](https://www.typescriptlang.org/): Typed superset of JavaScript
 
 ## Contributing
