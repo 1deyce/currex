@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
+	"time"
 
 	"log"
 
 	"github.com/1deyce/currex/converter"
 	"github.com/1deyce/currex/rates"
+	"github.com/1deyce/currex/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/joho/godotenv"
 )
 
 type CurrencyData struct {
@@ -25,10 +25,6 @@ type ConversionResponse struct {
 }
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -48,12 +44,7 @@ func main() {
 		to := data.To
 		amountStr := data.Amount
 
-		appID := os.Getenv("OPENEXCHANGE_APP_ID")
-		if appID == "" {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "OPENEXCHANGE_APP_ID not set"})
-		}
-
-		apiURL := fmt.Sprintf("https://openexchangerates.org/api/latest.json?app_id=%s&symbols=USD,GBP,EUR,JPY,ZAR", appID)
+		apiURL := "https://open.er-api.com/v6/latest/USD"
 		rates, err := rates.FetchRates(apiURL)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": fmt.Sprintf("Error fetching exchange rates: %v", err)})
@@ -77,21 +68,30 @@ func main() {
 		return c.Status(fiber.StatusOK).JSON(response)
     })
 
-	app.Get("/spots", func(c *fiber.Ctx) error { 
-		appID := os.Getenv("OPENEXCHANGE_APP_ID")
-		if appID == "" {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "OPENEXCHANGE_APP_ID not set"})
+	// TODO: fix apiURL
+	app.Get("/sse", func(c *fiber.Ctx) error { 
+		c.Set("Content-Type", "text/event-stream")
+		c.Set("Cache-Control", "no-cache")
+		c.Set("Connection", "keep-alive")
+		
+		for {
+			apiURL := "https://hexarate.paikama.co/api/rates/latest/USD?target=GBP"
+
+			rates, err := rates.FetchRates(apiURL)
+			if err!= nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": fmt.Sprintf("Error fetching exchange rates: %v", err)})
+			}
+
+			log.Printf("Fetched rates: %+v\n", rates)
+
+			message := utils.FormatRates(rates.Rates)
+			_, err = c.WriteString("data: " + message + "\n\n")
+			if err != nil {
+				return err
+			}
+
+			time.Sleep(5 * time.Second)
 		}
-
-		apiURL := fmt.Sprintf("https://openexchangerates.org/api/latest.json?app_id=%s&symbols=EUR,JPY,GBP,AUD,CAD,CHF,CNY,SEK,NZD,MXN,SGD,HKD,NOK,KRW,TRY,RUB,INR,BRL,ZAR,THB", appID)
-
-		rates, err := rates.FetchRates(apiURL)
-		if err!= nil {
-            return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": fmt.Sprintf("Error fetching exchange rates: %v", err)})
-        }
-
-		log.Printf("Fetched rates: %+v\n", rates)
-		return c.JSON(rates)
 	})
 
 	log.Fatal(app.Listen(":8000"))

@@ -8,8 +8,12 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
+type CurrencyRate = {
+    [key: string]: number;
+};
+
 const SpotPrices = () => {
-    const [spots, setSpots] = useState<{ [key: string]: number }>({});
+    const [spots, setSpots] = useState<CurrencyRate>({});
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -19,37 +23,39 @@ const SpotPrices = () => {
     }
 
     useEffect(() => {
-        const fetchSpots = async () => {
+        const sse = new EventSource(`${serverURL}/sse`);
+
+        sse.onmessage = (event) => {
+            console.log("Received message:", event.data);
             try {
-                const response = await fetch(`${serverURL}/spots`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                console.log(response);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log(data);
+                const data = event.data
+                    .split(";")
+                    .reduce((acc: CurrencyRate, curr: string) => {
+                        const [currency, rate] = curr.split(": ");
+                        if (currency && rate) {
+                            acc[currency] = parseFloat(rate);
+                        }
+                        return acc;
+                    }, {});
                 setSpots(data);
-            } catch (err) {
-                if (err instanceof Error) {
-                    setError(err.message);
-                } else {
-                    setError("An unknown error occurred.");
-                }
-            } finally {
+                setLoading(false);
+                setError(null);
+            } catch (error) {
+                setError("Failed to parse data");
                 setLoading(false);
             }
         };
 
-        fetchSpots();
-    }, []);
+        sse.onerror = () => {
+            setError("SSE connection error");
+            setLoading(false);
+            sse.close();
+        };
+
+        return () => {
+            sse.close();
+        };
+    }, [serverURL]);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
