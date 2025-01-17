@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"strconv"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/1deyce/currex/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/valyala/fasthttp"
 )
 
 type CurrencyData struct {
@@ -68,30 +70,49 @@ func main() {
 		return c.Status(fiber.StatusOK).JSON(response)
     })
 
-	// TODO: fix apiURL
-	app.Get("/sse", func(c *fiber.Ctx) error { 
+	app.Get("/sse", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/event-stream")
 		c.Set("Cache-Control", "no-cache")
 		c.Set("Connection", "keep-alive")
+	
+		c.Status(fiber.StatusOK)
+
+		writer := fasthttp.StreamWriter(func(w *bufio.Writer) {
+			for {
+				apiUrl := "https://open.er-api.com/v6/latest/USD"
 		
-		for {
-			apiURL := "https://hexarate.paikama.co/api/rates/latest/USD?target=GBP"
+				rates, err := rates.FetchRates(apiUrl)
+				if err != nil {
+					log.Printf("Error fetching exchange rates: %v", err) 
+					break 
+				}
+		
+				message := utils.FormatRates(rates.Rates)
+				_, err = w.WriteString("data: " + message + "\n\n")
+				if err != nil {
+					log.Printf("Error writing data: %v", err) 
+					break 
+				}
+		
+				_, err = w.WriteString(": heartbeat\n\n")
+				if err != nil {
+					log.Printf("Error writing heartbeat: %v", err)
+					break 
+				}
 
-			rates, err := rates.FetchRates(apiURL)
-			if err!= nil {
-				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": fmt.Sprintf("Error fetching exchange rates: %v", err)})
+				err = w.Flush()
+				if err != nil {
+					fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
+					break
+				}
+		
+				time.Sleep(5 * time.Second)
 			}
-
-			log.Printf("Fetched rates: %+v\n", rates)
-
-			message := utils.FormatRates(rates.Rates)
-			_, err = c.WriteString("data: " + message + "\n\n")
-			if err != nil {
-				return err
-			}
-
-			time.Sleep(5 * time.Second)
-		}
+		})
+		
+		c.Context().SetBodyStreamWriter(writer)
+		
+		return nil
 	})
 
 	log.Fatal(app.Listen(":8000"))

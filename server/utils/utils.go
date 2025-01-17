@@ -15,7 +15,7 @@ func ValidateInput(from string, to string, amount float64) error {
 func FormatRates(rates map[string]float64) string {
 	var result string
 	for currency, rate := range rates {
-        result += fmt.Sprintf("%s: %.4f", currency, rate)
+        result += fmt.Sprintf("%s: %.4f ", currency, rate)
     }
 	return result
 }
